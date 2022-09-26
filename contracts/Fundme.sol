@@ -16,9 +16,11 @@ contract FundMe {
     mapping(address => uint256) public addressToAmountFunded;
 
     address public owner;
+    AggregatorV3Interface public priceFeed;
 
-    constructor(){
+    constructor(address priceFeedAddress){
     owner = msg.sender;
+    priceFeed = AggregatorV3Interface(priceFeedAddress);
     }
 
 
@@ -26,7 +28,7 @@ contract FundMe {
 //payable function is like wallet which store the eth
     function fundMe() public payable{
         //setting up to send minimum eth
-        require(msg.value.getConversionRate() >= minimumUSD, "please pay more than 1 eth");
+        require(msg.value.getConversionRate(priceFeed) >= minimumUSD, "please pay more than 1 eth");
         funders.push(msg.sender);
         addressToAmountFunded[msg.sender] = msg.value;
     }
